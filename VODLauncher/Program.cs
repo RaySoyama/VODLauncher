@@ -8,13 +8,19 @@ namespace VODLauncher
 {
     class Program
     {
+        struct PathArg
+        {
+            public string path;
+            public string arg;
+        }
+
         static void Main(string[] args)
         {
             string fileName = "VODLauncher.json";
 
             string filePath = Directory.GetCurrentDirectory() + $"\\{fileName}";
 
-            List<string> gameDirectories = new List<string>();
+            List<PathArg> gameDirectories = new List<PathArg>();
 
 
             if (!File.Exists(filePath))
@@ -22,8 +28,8 @@ namespace VODLauncher
                 // Create a file to write to.
                 using (StreamWriter sw = File.CreateText(filePath))
                 {
-                    gameDirectories.Add("GamePath1");
-                    gameDirectories.Add("GamePath2");
+                    gameDirectories.Add(new PathArg() { path = "GamePath1", arg = "" });
+                    gameDirectories.Add(new PathArg() { path = "GamePath2", arg = "" });
                     sw.WriteLine(JsonConvert.SerializeObject(gameDirectories, Formatting.Indented));
                 }
 
@@ -34,7 +40,7 @@ namespace VODLauncher
 
             try
             {
-                gameDirectories = JsonConvert.DeserializeObject<List<string>>(File.ReadAllText(filePath));
+                gameDirectories = JsonConvert.DeserializeObject<List<PathArg>>(File.ReadAllText(filePath));
             }
             catch (Exception e)
             {
@@ -43,9 +49,9 @@ namespace VODLauncher
                 return;
             }
 
-            foreach (string gamePath in gameDirectories)
+            foreach (PathArg gamePath in gameDirectories)
             {
-                if (gamePath.Contains("GamePath") || gamePath == "" || gamePath == null || !File.Exists(gamePath))
+                if (gamePath.path.Contains("GamePath") || gamePath.path == "" || gamePath.path == null || !File.Exists(gamePath.path))
                 {
                     Console.WriteLine("Invalid game paths in configs");
                     Console.ReadKey();
@@ -54,7 +60,7 @@ namespace VODLauncher
                 {
                     try
                     {
-                        Process.Start(gamePath);
+                        Process.Start(gamePath.path, gamePath.arg);
                     }
                     catch (Exception)
                     {
