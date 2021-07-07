@@ -12,6 +12,7 @@ namespace VODLauncher
         {
             public string path;
             public string arg;
+            public int timeToSleep;
         }
 
         static void Main(string[] args)
@@ -19,6 +20,8 @@ namespace VODLauncher
             string fileName = "VODLauncher.json";
 
             string filePath = Directory.GetCurrentDirectory() + $"\\{fileName}";
+
+
 
             List<PathArg> gameDirectories = new List<PathArg>();
 
@@ -51,9 +54,11 @@ namespace VODLauncher
 
             foreach (PathArg gamePath in gameDirectories)
             {
+                Console.WriteLine($"Parsing...{gamePath.path}\nArg...{gamePath.arg}");
+
                 if (gamePath.path.Contains("GamePath") || gamePath.path == "" || gamePath.path == null || !File.Exists(gamePath.path))
                 {
-                    Console.WriteLine("Invalid game paths in configs");
+                    Console.WriteLine($"Invalid game paths in configs\n{gamePath.path}");
                     Console.ReadKey();
                 }
                 else
@@ -64,10 +69,12 @@ namespace VODLauncher
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine("Invalid game paths in configs. Shortcuts don't work for whatever fucking reason");
+                        Console.WriteLine($"Invalid game paths in configs. Shortcuts don't work for whatever fucking reason\n{gamePath.path}");
                         Console.ReadKey();
                     }
                 }
+
+                System.Threading.Thread.Sleep(gamePath.timeToSleep);
             }
         }
     }
